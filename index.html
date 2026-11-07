@@ -186,10 +186,8 @@ back:'<svg width="12" height="20" viewBox="0 0 12 20" fill="none" stroke="curren
 
 srch:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.400" stroke-linecap="round"><circle cx="10.500" cy="10.500" r="6.500"/><path d="m16 16 5 5"/></svg>'};
 
-function tile(sis,lg){var n=sis.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""),g=P.def,c="#8e8e93";
-
-if(/hyd|hidr/.test(n)){g=P.hid;c="#0a84ff"}else if(/batter|bater|bms|lithium|litio/.test(n)){g=P.bat;c="#30b94d"}else if(/motor|traction|tra[cç]/.test(n)){g=P.mot;c="#ff9500"}else if(/brak|trav|frei/.test(n)){g=P.tra;c="#ff3b30"}else if(/elect|eletr|can|commun|comun|sensor/.test(n)){g=P.ele;c="#af52de"}
-
+function tile(iconValue,lg){var n=String(iconValue||"").toLowerCase().normalize("NFD").replace(/[\\u0300-\\u036f]/g,""),g=P.def,c="#8e8e93";
+if(/hyd|hidr|oleo|oil/.test(n)){g=P.hid;c="#0a84ff"}else if(/batter|bater|bms|lithium|litio/.test(n)){g=P.bat;c="#30b94d"}else if(/motor|traction|trac/.test(n)){g=P.mot;c="#ff9500"}else if(/brak|trav|frei/.test(n)){g=P.tra;c="#ff3b30"}else if(/elect|eletr|can|commun|comun|sensor/.test(n)){g=P.ele;c="#af52de"}
 return '<span class="tile'+(lg?" lg":"")+'" style="background:'+c+'">'+g+'</span>'}
 
 var SAMPLE="marca,modelo,codigo,sistema,titulo,causa,solucao,manual,link\n"+
@@ -206,7 +204,7 @@ var SAMPLE="marca,modelo,codigo,sistema,titulo,causa,solucao,manual,link\n"+
 
 "Toyota,8FGF25,E330,Electrical,CAN communication fault,Damaged CAN wiring,Measure bus resistance; inspect connectors,Diagnostic manual p. 45,";
 
-var K=["marca","modelo","codigo","sistema","titulo","causa","solucao","manual","link"];
+var K=["marca","modelo","codigo","sistema","icone","titulo","causa","solucao","manual","link"];
 
 var S={v:"err",b:"All",q:"",D:[],fav:{},cfg:{id:"e6df2f4b-2f62-4667-af64-78f66f316ce8",key:"",tab:"Table 1",reg:"www.appsheet.com"},st:""};
 
@@ -236,7 +234,7 @@ function toast(t){var x=document.getElementById("toast");x.textContent=t;x.style
 
 function key(e){return e.marca+"|"+e.modelo+"|"+e.codigo}
 
-function cell(e){return '<button class="cell" data-k="'+esc(key(e))+'">'+tile(e.sistema)+'<div class="body"><div class="t">'+esc(e.titulo||e.codigo)+'</div><div class="m">'+esc(e.marca)+' '+esc(e.modelo)+'</div></div>'+(S.fav[key(e)]?'<span class="star">★</span>':'')+'<span class="cd">'+esc(e.codigo)+'</span>'+P.chev+'</button>'}
+function cell(e){return '<button class="cell" data-k="'+esc(key(e))+'">'+tile(e.icone)+'<div class="body"><div class="t">'+esc(e.titulo||e.codigo)+'</div><div class="m">'+esc(e.marca)+' '+esc(e.modelo)+'</div></div>'+(S.fav[key(e)]?'<span class="star">★</span>':'')+'<span class="cd">'+esc(e.codigo)+'</span>'+P.chev+'</button>'}
 
 function nav(){document.getElementById("nav").innerHTML=[["err","Faults"],["fav","Favourites"],["dat","Data"]].map(function(x){return '<button data-v="'+x[0]+'" class="'+(S.v===x[0]?"on":"")+'">'+P[x[0]].replace("<svg",'<svg width="26" height="26"')+x[1]+'</button>'}).join("")}
 
@@ -264,7 +262,7 @@ h+='<div class="hd" style="padding-top:6px">AppSheet</div><div class="grp"><div 
 
 '<div class="hd">Import manually</div><div class="grp"><textarea id="pt" placeholder="Paste AppSheet JSON or table data (CSV/Excel) here"></textarea></div><button class="btn s" id="im">Import</button><button class="btn s" id="ex" style="margin-top:10px">Restore sample data</button>'+
 
-'<div class="hd">Table columns</div><div class="foot" style="line-height:2"><code>marca</code> <code>modelo</code> <code>codigo</code> <code>sistema</code> <code>titulo</code> <code>causa</code> <code>solucao</code> <code>manual</code> <code>link</code><br>Only <code>codigo</code> is required.</div>';
+'<div class="hd">Table columns</div><div class="foot" style="line-height:2"><code>marca</code> <code>modelo</code> <code>codigo</code> <code>sistema</code> <code>icone</code> <code>titulo</code> <code>causa</code> <code>solucao</code> <code>manual</code> <code>link</code><br>Only <code>codigo</code> is required.</div>';
 
 m.innerHTML=h;
 
@@ -332,7 +330,7 @@ function sec(t,b){return b?'<div class="hd">'+t+'</div><div class="grp pad">'+es
 
 sh.innerHTML='<div class="bar"><button class="lnk" id="bk">'+P.back+' '+(S.v==="fav"?"Favourites":"Faults")+'</button><button class="lnk" id="fv" style="font-size:24px"></button></div>'+
 
-'<div class="hero">'+tile(e.sistema,1)+'<div><div class="dt">'+esc(e.titulo||e.codigo)+'</div><div class="m"><span class="cd">'+esc(e.codigo)+'</span> '+esc(e.marca)+' '+esc(e.modelo)+'</div></div></div>'+
+'<div class="hero">'+tile(e.icone,1)+'<div><div class="dt">'+esc(e.titulo||e.codigo)+'</div><div class="m"><span class="cd">'+esc(e.codigo)+'</span> '+esc(e.marca)+' '+esc(e.modelo)+'</div></div></div>'+
 
 sec("Fault Cause",e.causa)+sec("Recommended Action",e.solucao)+sec("Reference",e.manual)+
 
