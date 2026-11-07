@@ -128,12 +128,12 @@ var m=document.getElementById("main"),T={err:"Knowledge Center",fav:"Favoritos",
 nav();document.getElementById("tt").textContent=T[S.v];
 h='<div class="lt">'+T[S.v]+'</div>';
 if(S.v==="dat"){var c=S.cfg;
-h+='<div class="hd" style="padding-top:6px">AppSheet</div><div class="grp"><div class="frm"><label>ID da app</label><input id="ci" value="'+esc(c.id)+'" placeholder="App ID" autocapitalize="off" autocorrect="off"></div><div class="frm"><label>Chave</label><input id="ck" type="password" value="'+esc(c.key)+'" placeholder="Chave de acesso"></div><div class="frm"><label>Tabela</label><input id="ct" value="'+esc(c.tab)+'" placeholder="Table 1"></div><div class="frm"><label>Região</label><select id="cr"><option value="www.appsheet.com"'+(c.reg==="www.appsheet.com"?" selected":"")+'>Global</option><option value="eu.appsheet.com"'+(c.reg==="eu.appsheet.com"?" selected":"")+'>Europa</option></select></div></div>'+
+h+='<div class="hd" style="padding-top:6px">AppSheet</div><div class="grp"><div class="frm"><label>ID da app</label><input id="ci" value="'+esc(c.id)+'" placeholder="App ID" autocapitalize="off" autocorrect="off"></div><div class="frm"><label>Chave</label><input id="ck" type="password" value="'+esc(c.key)+'" placeholder="Chave de acesso"></div><div class="frm"><label>Tabela</label><input id="ct" value="'+esc(c.tab)+'" placeholder="Table 1"></div><div class="frm"><label>Região</label><select id="cr"><option value="www.appsheet.com"'+(c.reg==="www.appsheet.com"?" selected":"")+'>Global</option><option value="eu.appsheet.com"'+(c.reg==="eu.appsheet.com"?" selected":"")+'>Europa</option></select></div><div class="frm"><label>Proxy</label><input id="cx" value="'+esc(c.px||"")+'" placeholder="Opcional" autocapitalize="off" autocorrect="off"></div></div>'+
 '<div class="foot">O ID e a chave estão em AppSheet → Settings → Integrations → IN. Ficam guardados só neste telemóvel.</div><button class="btn" id="sy">Sincronizar com o AppSheet</button><div class="foot" id="st">'+esc(S.st)+'</div>'+
 '<div class="hd">Importar manualmente</div><div class="grp"><textarea id="pt" placeholder="Cola aqui o JSON do AppSheet ou as células (CSV/Excel)"></textarea></div><button class="btn s" id="im">Importar</button><button class="btn s" id="ex" style="margin-top:10px">Repor exemplo</button>'+
 '<div class="hd">Colunas da tabela</div><div class="foot" style="line-height:2"><code>marca</code> <code>modelo</code> <code>codigo</code> <code>sistema</code> <code>titulo</code> <code>causa</code> <code>solucao</code> <code>manual</code> <code>link</code><br>Só o <code>codigo</code> é obrigatório.</div>';
 m.innerHTML=h;
-["ci","ck","ct"].forEach(function(id){document.getElementById(id).oninput=function(){S.cfg[{ci:"id",ck:"key",ct:"tab"}[id]]=this.value.trim();save()}});
+["ci","ck","ct","cx"].forEach(function(id){document.getElementById(id).oninput=function(){S.cfg[{ci:"id",ck:"key",ct:"tab",cx:"px"}[id]]=this.value.trim();save()}});
 document.getElementById("cr").onchange=function(){S.cfg.reg=this.value;save()};
 document.getElementById("sy").onclick=sync;
 document.getElementById("im").onclick=function(){var d=parseAny(document.getElementById("pt").value);if(!d.length){toast("Não encontrei dados com a coluna codigo");return}S.D=d;S.st="Importados "+d.length+" erros.";save();render();toast(S.st)};
@@ -147,10 +147,19 @@ m.scrollTop=0;scr()}
 function scr(){var m=document.getElementById("main"),o=Math.min(1,Math.max(0,(m.scrollTop-24)/24));document.getElementById("tt").style.opacity=o;document.querySelector(".top").style.setProperty("--o",o)}
 function sync(){var c=S.cfg;
 if(!c.id||!c.key||!c.tab){toast("Preenche o ID, a chave e a tabela");return}
-S.st="A sincronizar…";document.getElementById("st").textContent=S.st;
-fetch("https://"+c.reg+"/api/v2/apps/"+encodeURIComponent(c.id)+"/tables/"+encodeURIComponent(c.tab)+"/Action",{method:"POST",headers:{"Content-Type":"application/json","ApplicationAccessKey":c.key},body:JSON.stringify({Action:"Find",Properties:{},Rows:[]})})
-.then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(j){var d=fromObjs(Array.isArray(j)?j:(j.Rows||[]));if(!d.length)throw 1;S.D=d;S.st="Sincronizado: "+d.length+" erros, às "+new Date().toLocaleTimeString("pt-PT",{hour:"2-digit",minute:"2-digit"});save();render()})
-.catch(function(){S.st="Não foi possível ligar ao AppSheet a partir desta página (bloqueio do navegador ou dados incorretos). Usa “Importar manualmente” por agora.";save();var e=document.getElementById("st");if(e)e.textContent=S.st})}
+function say(t){S.st=t;save();var e=document.getElementById("st");if(e)e.textContent=t}
+say("A sincronizar…");
+var base=c.px?c.px.replace(/\/+$/,""):"https://"+c.reg;
+fetch(base+"/api/v2/apps/"+encodeURIComponent(c.id)+"/tables/"+encodeURIComponent(c.tab)+"/Action",{method:"POST",headers:{"Content-Type":"application/json","ApplicationAccessKey":c.key},body:JSON.stringify({Action:"Find",Properties:{},Rows:[]})})
+.then(function(r){return r.text().then(function(t){return{ok:r.ok,s:r.status,t:t}})})
+.then(function(o){
+if(!o.ok){say("O AppSheet respondeu com erro "+o.s+": "+o.t.slice(0,160));return}
+if(!o.t.trim()){say("Resposta vazia do AppSheet. Confirma que a API está ativada, a chave está certa e o nome da tabela é igual ao da app.");return}
+var j;try{j=JSON.parse(o.t)}catch(e){say("Resposta inesperada do AppSheet: "+o.t.slice(0,120));return}
+var d=fromObjs(Array.isArray(j)?j:(j.Rows||[]));
+if(!d.length){say("Ligou, mas não encontrei linhas com a coluna codigo. Resposta: "+o.t.slice(0,120));return}
+S.D=d;S.st="Sincronizado: "+d.length+" erros, às "+new Date().toLocaleTimeString("pt-PT",{hour:"2-digit",minute:"2-digit"});save();render()})
+.catch(function(){say("Sem resposta do AppSheet. Se tens internet, o navegador bloqueou o pedido (regra CORS): é preciso o intermediário Worker, cujo endereço colas no campo Proxy.")})}
 function open(k){
 var e=S.D.filter(function(x){return key(x)===k})[0];if(!e)return;
 var sh=document.getElementById("sheet");
