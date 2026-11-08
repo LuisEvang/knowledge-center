@@ -34,14 +34,18 @@ main{flex:1;overflow-y:auto;padding:10px 18px 28px}
 .qa{background:var(--card);box-shadow:var(--sh);border:0;border-radius:16px;padding:13px 4px 11px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12.5px;font-weight:500}
 .qa .tile{width:38px;height:38px;border-radius:11px}.qa .tile svg{width:20px;height:20px}
 .qa:active,.it:active,.sc:active{transform:scale(.98)}
-.seg{display:inline-flex;background:var(--card);border-radius:10px;padding:3px;box-shadow:var(--sh);margin-bottom:12px}
-.seg button{border:0;background:none;padding:6px 16px;border-radius:8px;font-size:14px;color:var(--mut)}
+.seg{display:inline-flex;max-width:100%;overflow-x:auto;scrollbar-width:none;background:var(--card);border-radius:10px;padding:3px;box-shadow:var(--sh);margin-bottom:12px}.seg::-webkit-scrollbar{display:none}
+.seg button{flex:none;border:0;background:none;padding:6px 12px;border-radius:8px;font-size:13.5px;white-space:nowrap;color:var(--mut)}
 .seg button.on{background:var(--fill);color:var(--tx);font-weight:600}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .sc{background:var(--card);box-shadow:var(--sh);border:0;border-radius:16px;padding:14px;text-align:left;display:block;width:100%}
 .sl{display:flex;align-items:center;gap:8px;color:var(--mut);font-size:13px}
 .rail{display:flex;gap:10px;overflow-x:auto;margin:0 -18px;padding:2px 18px 8px;scroll-snap-type:x proximity;scroll-padding-left:18px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .rail::-webkit-scrollbar{display:none}
+.uc{flex:none;width:236px;min-height:112px;padding:13px 14px;scroll-snap-align:start;display:flex;flex-direction:column;align-items:stretch;gap:8px;text-align:left}
+.ut{display:flex;align-items:center;justify-content:space-between}.ut em{font-style:normal;font-size:12px;color:var(--mut)}
+.ch{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border-radius:7px;padding:3px 8px}
+.uh{font-size:15px;font-weight:600;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .gc{flex:none;width:158px;height:62px;display:flex;flex-direction:column;justify-content:center;gap:9px;padding:0 14px;scroll-snap-align:start}
 .gt{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:600;min-width:0}
 .gt i{width:12px;height:12px;border-radius:3px;flex:none}.gt span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -109,7 +113,7 @@ code{background:var(--fill);border-radius:5px;padding:1px 5px;font-size:12px}
 <div id="app">
 <main id="main"></main>
 <nav id="nav"></nav>
-<div class="ov" id="srch"><div class="top"><div class="sb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input id="sq" type="search" placeholder="Search by code, brand or model"></div><button class="lnk" id="sc" style="margin-left:12px">Cancel</button></div><div id="sr"></div></div>
+<div class="ov" id="srch"><div class="top"><div class="sb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input id="sq" type="search" placeholder="Search by code, brand, model or title"></div><button class="lnk" id="sc" style="margin-left:12px">Cancel</button></div><div class="pills" id="sp"><button class="pill on" data-sc="all">All</button><button class="pill" data-sc="err">Errors</button><button class="pill" data-sc="man">Manuals</button><button class="pill" data-sc="vid">Videos</button><button class="pill" data-sc="upd">Updates &amp; Alerts</button></div><div id="sr"></div></div>
 <div class="ov" id="sheet"></div>
 <div id="toast"></div>
 </div>
@@ -123,6 +127,8 @@ set:G('<circle cx="12" cy="12" r="3"/><path d="M12 2.500v3M12 18.500v3M2.500 12h
 man:G('<path d="M5 4.500A1.500 1.500 0 0 1 6.500 3H19v15H6.500A1.500 1.500 0 0 0 5 19.500z"/><path d="M5 19.500A1.500 1.500 0 0 0 6.500 21H19v-3"/>'),
 syn:G('<path d="M20 12a8 8 0 0 1-14 5.300M4 12a8 8 0 0 1 14-5.300"/><path d="M18.500 3v4h-4M5.500 21v-4h4"/>'),
 srch:G('<circle cx="10.500" cy="10.500" r="6.500"/><path d="m16 16 5 5"/>'),
+bell:G('<path d="M6 9a6 6 0 0 1 12 0c0 6 2.500 7.500 2.500 7.500h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/>'),
+upd:G('<circle cx="12" cy="12" r="9"/><path d="M12 16V8M8.500 11.500 12 8l3.500 3.500"/>'),
 vid:G('<path d="M8 5.500v13l11-6.500z"/>',1),
 back:G('<path d="M15 5 8 12l7 7"/>'),
 hid:G('<path d="M12 2.500s6.500 6.800 6.500 11.500a6.500 6.500 0 0 1-13 0C5.500 9.300 12 2.500 12 2.500z"/>',1),
@@ -137,20 +143,21 @@ if(ic){g=ic;c=col}
 return '<span class="tile'+(lg?" lg":"")+'" style="background:'+c+'">'+g+'</span>'}
 var SAMPLE="marca,modelo,codigo,sistema,titulo,causa,solucao,manual,link,video\nToyota,8FBE15,E204,Battery,Battery voltage out of range,Loose connection or failing cell,Check cell voltage; tighten terminals,Service manual p.87,,\nLinde,E20,F305,Motor,Traction motor overheating,Blocked ventilation or faulty sensor,Clean ventilation; test sensor,Repair manual p.140,,\nJungheinrich,EFG 216,E101,Hydraulic,Low hydraulic pressure,Low oil or clogged filter,Check level; replace filter,Service manual p.112,,";
 var K=["marca","modelo","codigo","sistema","titulo","causa","solucao","manual","link","video","data","paginas"];
-var S={v:"home",gf:null,ov:"b",D:[],M:[],fav:{},notes:{},cfg:{id:"e6df2f4b-2f62-4667-af64-78f66f316ce8",key:"",tab:"Table 1",tab2:"",reg:"www.appsheet.com",px:""},st:""};
+var S={v:"home",gf:null,ov:"b",D:[],M:[],U:[],fav:{},notes:{},cfg:{id:"e6df2f4b-2f62-4667-af64-78f66f316ce8",key:"",tab:"Table 1",tab2:"",tab3:"",reg:"www.appsheet.com",px:""},st:""};
 function el(i){return document.getElementById(i)}
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function norm(s){return String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z]/g,"")}
 function url(s){return/^https?:\/\//.test(s)}
 function fromObjs(a){return a.map(function(r,n){var o={id:n},m={};Object.keys(r).forEach(function(k){m[norm(k)]=r[k]});K.forEach(function(k){o[k]=m[k]==null?"":String(m[k]).trim()});if(!o.data)o.data=String(m.date||"").trim();if(!o.paginas)o.paginas=String(m.pages||m.numerodepaginas||m.npaginas||"").trim();return o}).filter(function(o){return o.codigo})}
 function fromObjsM(a){return a.map(function(r){var m={},o={};Object.keys(r).forEach(function(k){m[norm(k)]=r[k]});["marca","modelo","titulo","categoria","link","data","paginas"].forEach(function(k){o[k]=m[k]==null?"":String(m[k]).trim()});if(!o.data)o.data=String(m.date||"").trim();if(!o.paginas)o.paginas=String(m.pages||m.numerodepaginas||m.npaginas||"").trim();return o}).filter(function(o){return o.titulo||url(o.link)})}
+function fromObjsU(a){return a.map(function(r){var m={},o={};Object.keys(r).forEach(function(k){m[norm(k)]=r[k]});["titulo","tipo","marca","modelo","data","mensagem","link"].forEach(function(k){o[k]=m[k]==null?"":String(m[k]).trim()});if(!o.mensagem)o.mensagem=String(m.descricao||m.message||m.description||m.texto||"").trim();if(!o.tipo)o.tipo=String(m.type||m.categoria||"").trim();if(!o.data)o.data=String(m.date||"").trim();return o}).filter(function(o){return o.titulo||o.mensagem})}
 function parseCSV(t){var d=t.split("\n")[0].indexOf("\t")>-1?"\t":",",r=[],row=[],f="",q=false,i,c;
 for(i=0;i<t.length;i++){c=t[i];if(q){if(c=='"'){if(t[i+1]=='"'){f+='"';i++}else q=false}else f+=c}else if(c=='"')q=true;else if(c==d){row.push(f);f=""}else if(c=="\n"){row.push(f);r.push(row);row=[];f=""}else if(c!="\r")f+=c}
 row.push(f);r.push(row);r=r.filter(function(x){return x.join("").trim()});if(r.length<2)return[];
 var h=r[0];return r.slice(1).map(function(x){var o={};h.forEach(function(k,i){o[k]=x[i]||""});return o})}
 function parseAny(t){t=t.trim();if(!t)return[];try{if(t[0]==="["||t[0]==="{"){var j=JSON.parse(t);return fromObjs(Array.isArray(j)?j:(j.Rows||[]))}}catch(e){return[]}return fromObjs(parseCSV(t))}
-function save(){try{localStorage.setItem("kcA",JSON.stringify({D:S.D,M:S.M,fav:S.fav,notes:S.notes,cfg:S.cfg,st:S.st}))}catch(e){}}
-try{var s=JSON.parse(localStorage.getItem("kcA")||"null");if(s){S.D=s.D||[];S.M=s.M||[];S.fav=s.fav||{};S.notes=s.notes||{};S.cfg=Object.assign(S.cfg,s.cfg||{});S.st=s.st||""}}catch(e){}
+function save(){try{localStorage.setItem("kcA",JSON.stringify({D:S.D,M:S.M,U:S.U,fav:S.fav,notes:S.notes,cfg:S.cfg,st:S.st}))}catch(e){}}
+try{var s=JSON.parse(localStorage.getItem("kcA")||"null");if(s){S.D=s.D||[];S.M=s.M||[];S.U=s.U||[];S.fav=s.fav||{};S.notes=s.notes||{};S.cfg=Object.assign(S.cfg,s.cfg||{});S.st=s.st||""}}catch(e){}
 if(!S.D.length)S.D=parseAny(SAMPLE);
 function toast(t){var x=el("toast");x.textContent=t;x.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(function(){x.style.display="none"},2800)}
 function key(e){return e.marca+"|"+e.modelo+"|"+e.codigo}
@@ -161,6 +168,14 @@ function gcard(o,mx){var h=hue(o.v),c="hsl("+h+",70%,52%)";return '<button class
 function stat(l,v,c){return '<div class="sc"><div class="sl"><i style="background:'+c+'"></i><span>'+l+'</span></div><div class="sv">'+esc(v)+'</div></div>'}
 function item(e){var k=key(e);return '<button class="it" data-k="'+esc(k)+'">'+tile(e.sistema)+'<div class="bd"><div class="t">'+esc(e.titulo||e.codigo)+'</div><div class="m">'+esc(e.marca)+' · '+esc(e.modelo)+'</div></div><div class="rt"><div class="cd">'+(S.fav[k]?"♥ ":"")+esc(e.codigo)+'</div><div class="m">'+esc(e.sistema)+'</div></div></button>'}
 var ML=[];
+function isAlert(u){return/alert|urgent|recall|safety|segur|warning|aviso/i.test(u.tipo||"")}
+function ucol(u){return isAlert(u)?"#ff3b30":"#0a7aff"}
+function ulabel(u){return u.tipo||(isAlert(u)?"Alert":"Update")}
+function dts(v){var t=Date.parse(v);return isNaN(t)?0:t}
+function sortedU(){return S.U.slice().sort(function(a,b){return dts(b.data)-dts(a.data)})}
+function ucard(u){var c=ucol(u);return '<button class="sc uc" data-ui="'+S.U.indexOf(u)+'"><div class="ut"><span class="ch" style="color:'+c+';background:'+c+'1f">'+esc(ulabel(u))+'</span><em>'+(u.data?esc(fmtDate(u.data)):"")+'</em></div><div class="uh">'+esc(u.titulo||u.mensagem)+'</div><div class="m">'+esc(u.marca)+(u.modelo?" · "+esc(u.modelo):"")+'</div></button>'}
+function urow(u){var c=ucol(u);return '<button class="it" data-ui="'+S.U.indexOf(u)+'">'+tile("",0,isAlert(u)?P.bell:P.upd,c)+'<div class="bd"><div class="t">'+esc(u.titulo||u.mensagem)+'</div><div class="m">'+esc(u.marca)+(u.modelo?" · "+esc(u.modelo):"")+'</div></div><div class="rt"><div class="cd" style="color:'+c+'">'+esc(ulabel(u))+'</div><div class="m">'+(u.data?esc(fmtDate(u.data)):"")+'</div></div></button>'}
+function vsrow(e){return '<button class="it" data-k="'+esc(key(e))+'">'+tile("",0,P.vid,"#ff3b30")+'<div class="bd"><div class="t">'+esc(e.titulo||e.codigo)+'</div><div class="m">'+esc(e.marca)+" · "+esc(e.modelo)+'</div></div><div class="rt"><div class="cd" style="color:var(--ac)">Video</div><div class="m">'+esc(e.codigo)+'</div></div></button>'}
 function toManual(e){return{titulo:e.manual||e.titulo||e.codigo,marca:e.marca,modelo:e.modelo,categoria:"",link:e.link,data:e.data,paginas:e.paginas}}
 function manuals(){return S.M.length?S.M:S.D.filter(function(e){return url(e.link)}).map(toManual)}
 function mrow(x){return '<button class="it" data-mi="'+ML.indexOf(x)+'">'+tile("",0,P.man,"#0a7aff")+'<div class="bd"><div class="t">'+esc(x.titulo||host(x.link))+'</div><div class="m">'+esc(x.marca)+(x.modelo?" · "+esc(x.modelo):"")+'</div></div><span style="color:var(--mut);font-size:22px;line-height:1">›</span></button>'}
@@ -175,16 +190,16 @@ function tabs(){el("nav").innerHTML=[["home","Home"],["err","Errors"],["fav","Fa
 function render(keep){
 var m=el("main"),h="",st=m.scrollTop;tabs();
 if(S.v==="home"){
-var g=groups(S.ov==="s"?"sistema":"marca");
+var g=S.ov==="u"?[]:groups(S.ov==="s"?"sistema":"marca"),us=sortedU();
 h='<div class="h0"><div class="ttl">Knowledge Center</div><div class="ic"><button data-a="search" aria-label="Search">'+P.srch+'</button></div></div>'+
 '<div class="qas"><button class="qa" data-q="err">'+tile("",0,P.err,"#ff9500")+'Errors</button><button class="qa" data-q="man">'+tile("",0,P.man,"#0a7aff")+'Manuals</button><button class="qa" data-q="vid">'+tile("",0,P.vid,"#ff3b30")+'Videos</button><button class="qa" data-q="syn">'+tile("",0,P.syn,"#30b94d")+'Sync</button></div>'+
-'<div class="sec"><b>Overview</b></div><div class="seg"><button data-s="b" class="'+(S.ov==="b"?"on":"")+'">Brands</button><button data-s="s" class="'+(S.ov==="s"?"on":"")+'">Systems</button></div><div class="rail">'+(g.length?g.map(function(o){return gcard(o,g[0].n)}).join(""):'<div class="empty" style="width:100%">No data yet</div>')+'</div>'+
+'<div class="sec"><b>Overview</b></div><div class="seg"><button data-s="b" class="'+(S.ov==="b"?"on":"")+'">Brands</button><button data-s="s" class="'+(S.ov==="s"?"on":"")+'">Troubleshooting</button><button data-s="u" class="'+(S.ov==="u"?"on":"")+'">Updates &amp; Alerts</button></div><div class="rail">'+(S.ov==="u"?(us.length?us.slice(0,12).map(ucard).join(""):'<div class="empty" style="width:100%;padding:22px 0">No updates or alerts yet</div>'):(g.length?g.map(function(o){return gcard(o,g[0].n)}).join(""):'<div class="empty" style="width:100%">No data yet</div>'))+'</div>'+
 '<div class="sec"><b>Latest errors</b><button data-q="err">View all</button></div>'+list(S.D.slice(-5).reverse(),"No errors yet")
 }else if(S.v==="set"){var c=S.cfg;
-h='<div class="big">Settings</div><div class="hd" style="margin-top:0">AppSheet connection</div><div class="grp"><div class="frm"><label>App ID</label><input id="ci" value="'+esc(c.id)+'" autocapitalize="off" autocorrect="off"></div><div class="frm"><label>Access key</label><input id="ck" type="password" value="'+esc(c.key)+'" placeholder="Paste key"></div><div class="frm"><label>Table</label><input id="ct" value="'+esc(c.tab)+'"></div><div class="frm"><label>Manuals</label><input id="cm" value="'+esc(c.tab2||"")+'" placeholder="Table name (optional)" autocapitalize="off" autocorrect="off"></div><div class="frm"><label>Region</label><select id="cr"><option value="www.appsheet.com"'+(c.reg==="www.appsheet.com"?" selected":"")+'>Global</option><option value="eu.appsheet.com"'+(c.reg==="eu.appsheet.com"?" selected":"")+'>Europe</option></select></div><div class="frm"><label>Proxy</label><input id="cx" value="'+esc(c.px||"")+'" placeholder="Optional" autocapitalize="off" autocorrect="off"></div></div>'+
+h='<div class="big">Settings</div><div class="hd" style="margin-top:0">AppSheet connection</div><div class="grp"><div class="frm"><label>App ID</label><input id="ci" value="'+esc(c.id)+'" autocapitalize="off" autocorrect="off"></div><div class="frm"><label>Access key</label><input id="ck" type="password" value="'+esc(c.key)+'" placeholder="Paste key"></div><div class="frm"><label>Table</label><input id="ct" value="'+esc(c.tab)+'"></div><div class="frm"><label>Manuals</label><input id="cm" value="'+esc(c.tab2||"")+'" placeholder="Table name (optional)" autocapitalize="off" autocorrect="off"></div><div class="frm"><label>Updates</label><input id="cu" value="'+esc(c.tab3||"")+'" placeholder="Table name (optional)" autocapitalize="off" autocorrect="off"></div><div class="frm"><label>Region</label><select id="cr"><option value="www.appsheet.com"'+(c.reg==="www.appsheet.com"?" selected":"")+'>Global</option><option value="eu.appsheet.com"'+(c.reg==="eu.appsheet.com"?" selected":"")+'>Europe</option></select></div><div class="frm"><label>Proxy</label><input id="cx" value="'+esc(c.px||"")+'" placeholder="Optional" autocapitalize="off" autocorrect="off"></div></div>'+
 '<button class="btn" data-a="sync">Sync now</button><div class="foot" id="st">'+esc(S.st)+'</div>'+
 '<div class="hd">Manual import</div><div class="grp"><textarea id="pt" placeholder="Paste AppSheet JSON or table cells (CSV)"></textarea></div><button class="btn s" id="im">Import</button><button class="btn s" id="ex" style="margin-top:10px">Reset sample data</button>'+
-'<div class="hd">Table columns</div><div class="foot" style="line-height:2"><code>marca</code> <code>modelo</code> <code>codigo</code> <code>sistema</code> <code>titulo</code> <code>causa</code> <code>solucao</code> <code>manual</code> <code>link</code> <code>video</code><br>Only <code>codigo</code> is required.<br>Manuals table: <code>titulo</code> <code>marca</code> <code>modelo</code> <code>categoria</code> <code>link</code> <code>data</code> <code>paginas</code> Put a video URL in <code>video</code> to show it in Videos.</div>'
+'<div class="hd">Table columns</div><div class="foot" style="line-height:2"><code>marca</code> <code>modelo</code> <code>codigo</code> <code>sistema</code> <code>titulo</code> <code>causa</code> <code>solucao</code> <code>manual</code> <code>link</code> <code>video</code><br>Only <code>codigo</code> is required.<br>Manuals table: <code>titulo</code> <code>marca</code> <code>modelo</code> <code>categoria</code> <code>link</code> <code>data</code> <code>paginas</code><br>Updates table: <code>titulo</code> <code>tipo</code> <code>marca</code> <code>modelo</code> <code>data</code> <code>mensagem</code> <code>link</code> Put a video URL in <code>video</code> to show it in Videos.</div>'
 }else if(S.v==="man"){
 var gf=S.gf,ml=manuals();ML=ml;var ms=ml.filter(function(x){return!gf||x[gf.f]===gf.v}),bm={},cats={};
 ml.forEach(function(x){if(x.marca)bm[x.marca]=1});ms.forEach(function(x){var k=x.categoria||"Other";(cats[k]=cats[k]||[]).push(x)});
@@ -197,7 +212,7 @@ h='<div class="big">'+T+'</div><div class="pills"><button class="pill'+(!gf?" on
 list(l,S.v==="fav"?"No favorites yet":S.v==="man"?"No manual links yet.<br>Add a URL in the link column.":S.v==="vid"?"No videos yet.<br>Add a URL in the video column.":"No errors",item)+'<div class="foot" style="text-align:center">'+l.length+(l.length===1?" entry":" entries")+'</div>'}
 m.innerHTML=h;m.scrollTop=keep?st:0;
 if(S.v==="set"){
-var mp={ci:"id",ck:"key",ct:"tab",cm:"tab2",cx:"px"};Object.keys(mp).forEach(function(i){el(i).oninput=function(){S.cfg[mp[i]]=this.value.trim();save()}});
+var mp={ci:"id",ck:"key",ct:"tab",cm:"tab2",cu:"tab3",cx:"px"};Object.keys(mp).forEach(function(i){el(i).oninput=function(){S.cfg[mp[i]]=this.value.trim();save()}});
 el("cr").onchange=function(){S.cfg.reg=this.value;save()};
 el("im").onclick=function(){var d=parseAny(el("pt").value);if(!d.length){toast("No rows with a codigo column found");return}S.D=d;S.st="Imported "+d.length+" errors.";save();render();toast(S.st)};
 el("ex").onclick=function(){S.D=parseAny(SAMPLE);save();render();toast("Sample data restored")}}}
@@ -213,7 +228,8 @@ if(!c.id||!c.key||!c.tab){toast("Fill in App ID, access key and table in Setting
 function say(t,ok){S.st=t;save();var e=el("st");if(e)e.textContent=t;toast(t);if(ok)render(1)}
 toast("Syncing…");
 api(c.tab).then(function(rows){var d=fromObjs(rows);if(!d.length)throw new Error("Connected, but no rows with a codigo column were found.");S.D=d;return c.tab2?api(c.tab2).then(function(r){S.M=fromObjsM(r)}):0})
-.then(function(){say("Synced "+S.D.length+" errors"+(c.tab2?", "+S.M.length+" manuals":"")+" at "+new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}),1)})
+.then(function(){return c.tab3?api(c.tab3).then(function(r){S.U=fromObjsU(r)}):0})
+.then(function(){say("Synced "+S.D.length+" errors"+(c.tab2?", "+S.M.length+" manuals":"")+(c.tab3?", "+S.U.length+" updates":"")+" at "+new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}),1)})
 .catch(function(e){say(e.message)})}
 function host(u){return u.replace(/^https?:\/\/(www\.)?/,"").split(/[\/?#]/)[0]}
 function embed(u){var m;
@@ -239,21 +255,37 @@ function heart(){var f=el("fv");f.textContent=S.fav[k]?"♥":"♡";f.style.color
 heart();sh.scrollTop=0;sh.classList.add("open");
 el("bk").onclick=function(){sh.classList.remove("open");setTimeout(function(){if(!sh.classList.contains("open"))sh.innerHTML=""},400);if(!el("srch").classList.contains("open"))render(1)};
 el("fv").onclick=function(){S.fav[k]=!S.fav[k];if(!S.fav[k])delete S.fav[k];save();heart()}}
-function fmtDate(v){var m=String(v||"").match(/^(\d{4})-(\d{2})-(\d{2})/);return m?new Date(+m[1],m[2]-1,+m[3]).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}):(v||"—")}
+function fmtDate(v){v=String(v||"");if(!v)return"—";var m=v.match(/^(\d{4})-(\d{2})-(\d{2})/),d=m?new Date(+m[1],m[2]-1,+m[3]):new Date(v);return isNaN(d)?v:d.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}
 function openManual(x){var sh=el("sheet"),pg=/^\d+$/.test(x.paginas||"")?x.paginas+" pages":(x.paginas||"—");
 sh.innerHTML='<div class="top"><button class="rb" id="bk" aria-label="Back">'+P.back+'</button><b>Manual</b><span style="width:40px"></span></div>'+tile("",1,P.man,"#0a7aff")+'<div class="dt">'+esc(x.titulo||host(x.link))+'</div><div class="sub">'+esc(x.marca)+(x.modelo?" · "+esc(x.modelo):"")+(x.categoria?" · "+esc(x.categoria):"")+'</div>'+
 (url(x.link)?'<a class="btn" target="_blank" rel="noopener" href="'+esc(x.link)+'">Open manual</a>':'<div class="btn s" style="color:var(--mut)">No link yet</div>')+
 '<div class="hd">Details</div><div class="grid">'+stat("Date",fmtDate(x.data),"#0a7aff")+stat("Pages",pg,"#ff9500")+'</div>';
 sh.scrollTop=0;sh.classList.add("open");
 el("bk").onclick=function(){sh.classList.remove("open");setTimeout(function(){if(!sh.classList.contains("open"))sh.innerHTML=""},400);render(1)}}
-function openSearch(){var o=el("srch");o.classList.add("open");el("sq").value="";el("sr").innerHTML='<div class="empty">Type a code, brand or model</div>';setTimeout(function(){el("sq").focus()},60)}
-el("sq").oninput=function(){var q=this.value.toLowerCase().trim();
-el("sr").innerHTML=q?list(S.D.filter(function(e){return [e.codigo,e.titulo,e.marca,e.modelo,e.sistema,e.causa].join(" ").toLowerCase().indexOf(q)>-1}),"No results"):'<div class="empty">Type a code, brand or model</div>'};
+function openUpdate(u){var sh=el("sheet"),c=ucol(u),al=isAlert(u);
+sh.innerHTML='<div class="top"><button class="rb" id="bk" aria-label="Back">'+P.back+'</button><b>'+(al?"Alert":"Update")+'</b><span style="width:40px"></span></div>'+tile("",1,al?P.bell:P.upd,c)+'<div class="dt">'+esc(u.titulo||"Untitled")+'</div><div class="sub">'+esc(u.marca)+(u.modelo?" · "+esc(u.modelo):"")+'</div>'+(u.mensagem?'<div class="grp pad" style="margin-top:16px;white-space:pre-wrap">'+esc(u.mensagem)+'</div>':"")+(url(u.link)?'<a class="btn" target="_blank" rel="noopener" href="'+esc(u.link)+'">Read more</a>':"")+'<div class="hd">Details</div><div class="grid">'+stat("Date",fmtDate(u.data),c)+stat("Type",ulabel(u),c)+'</div>';
+sh.scrollTop=0;sh.classList.add("open");
+el("bk").onclick=function(){sh.classList.remove("open");setTimeout(function(){if(!sh.classList.contains("open"))sh.innerHTML=""},400);render(1)}}
+function pillsSc(){document.querySelectorAll("#sp .pill").forEach(function(b){b.classList.toggle("on",b.dataset.sc===S.sc)})}
+function runSearch(){var q=el("sq").value.toLowerCase().trim(),sc=S.sc||"all",o=el("sr");
+if(!q){o.innerHTML='<div class="empty">Type a code, brand, model or title</div>';return}
+function mt(a){return a.join(" ").toLowerCase().indexOf(q)>-1}
+var er=(sc==="all"||sc==="err")?S.D.filter(function(e){return mt([e.codigo,e.titulo,e.marca,e.modelo,e.sistema,e.causa,e.solucao])}):[],
+vd=(sc==="all"||sc==="vid")?S.D.filter(function(e){return url(e.video)&&mt([e.codigo,e.titulo,e.marca,e.modelo,e.sistema])}):[],
+ml=manuals();ML=ml;
+var mn=(sc==="all"||sc==="man")?ml.filter(function(x){return mt([x.titulo,x.marca,x.modelo,x.categoria])}):[],
+up=(sc==="all"||sc==="upd")?S.U.filter(function(u){return mt([u.titulo,u.tipo,u.marca,u.modelo,u.mensagem])}):[];
+function sc2(t,a,fn){return a.length?'<div class="hd" style="margin-top:6px">'+t+' · '+a.length+'</div>'+a.map(function(x){return fn(x)}).join(""):""}
+o.innerHTML=sc2("Errors",er,item)+sc2("Manuals",mn,mrow)+sc2("Videos",vd,vsrow)+sc2("Updates & Alerts",up,urow)||'<div class="empty">No results</div>'}
+function openSearch(){var o=el("srch");S.sc="all";pillsSc();o.classList.add("open");el("sq").value="";runSearch();setTimeout(function(){el("sq").focus()},60)}
+el("sq").oninput=runSearch;
 el("sc").onclick=function(){el("srch").classList.remove("open");el("sq").blur()};
 document.addEventListener("click",function(ev){var t=ev.target,x;
 if(t.closest("a[href]"))return;
 if(x=t.closest("[data-k]")){open(x.dataset.k)}
 else if(x=t.closest("[data-mi]")){openManual(ML[+x.dataset.mi])}
+else if(x=t.closest("[data-ui]")){openUpdate(S.U[+x.dataset.ui])}
+else if(x=t.closest("[data-sc]")){S.sc=x.dataset.sc;pillsSc();runSearch()}
 else if(x=t.closest("[data-v]")){S.v=x.dataset.v;S.gf=null;render()}
 else if(x=t.closest("[data-q]")){var q=x.dataset.q;if(q==="syn")sync();else{S.v=q;S.gf=null;render()}}
 else if(x=t.closest("[data-g]")){var p=x.dataset.g.split("|");S.v="err";S.gf={f:p[0],v:p.slice(1).join("|")};render()}
