@@ -162,7 +162,7 @@ function render(keep){
 var m=el("main"),h="",st=m.scrollTop;tabs();
 if(S.v==="home"){
 var g=groups(S.ov==="s"?"sistema":"marca");
-h='<div class="h0"><div class="ttl">Knowledge Center</div><div class="ic"><button data-a="search" aria-label="Search">'+P.srch+'</button><button data-a="sync" aria-label="Sync">'+P.syn+'</button></div></div>'+
+h='<div class="h0"><div class="ttl">Knowledge Center</div><div class="ic"><button data-a="search" aria-label="Search">'+P.srch+'</button></div></div>'+
 '<div class="qas"><button class="qa" data-q="err">'+tile("",0,P.err,"#ff9500")+'Errors</button><button class="qa" data-q="man">'+tile("",0,P.man,"#0a7aff")+'Manuals</button><button class="qa" data-q="vid">'+tile("",0,P.vid,"#ff3b30")+'Videos</button><button class="qa" data-q="syn">'+tile("",0,P.syn,"#30b94d")+'Sync</button></div>'+
 '<div class="sec"><b>Overview</b><button data-q="err">View all</button></div><div class="seg"><button data-s="b" class="'+(S.ov==="b"?"on":"")+'">Brands</button><button data-s="s" class="'+(S.ov==="s"?"on":"")+'">Systems</button></div><div class="rail">'+(g.length?g.map(gcard).join(""):'<div class="empty" style="width:100%">No data yet</div>')+'</div>'+
 '<div class="sec"><b>Latest errors</b><button data-q="err">View all</button></div>'+list(S.D.slice(-5).reverse(),"No errors yet")
